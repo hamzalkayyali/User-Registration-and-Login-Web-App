@@ -19,3 +19,5 @@ When a user logs in successfully, the homepage displays a list of all registered
 - ✅ User Login (authenticate with Oracle DB)  
 - ✅ Show all registered users on the homepage after login  
 - ✅ Oracle Database integration using JDBC  
+## 🎥 Demo
+Watch the app in action here: [Demo Video](https://youtu.be/-TUpvt4tkZo)
