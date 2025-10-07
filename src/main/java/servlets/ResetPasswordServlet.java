@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.sql.*;
 
 import db.DBUtil;
-import utils.PasswordUtil; // ✅ use same utility class
+import utils.PasswordUtil; 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -22,14 +22,12 @@ public class ResetPasswordServlet extends HttpServlet {
         String username = request.getParameter("username");
         String newPassword = request.getParameter("newPassword");
 
-        // ✅ 1. Check required fields
         if (username == null || newPassword == null || username.isEmpty() || newPassword.isEmpty()) {
             request.setAttribute("message", "Please fill in all fields.");
             request.getRequestDispatcher("resetPassword.jsp").forward(request, response);
             return;
         }
 
-        // ✅ 2. Enforce password complexity
         if (!isPasswordComplex(newPassword)) {
             request.setAttribute("message", "Password must be at least 8 characters long, contain uppercase, lowercase, a number, and a special character.");
             request.getRequestDispatcher("resetPassword.jsp").forward(request, response);
@@ -39,7 +37,6 @@ public class ResetPasswordServlet extends HttpServlet {
         try (Connection conn = DBUtil.getConnection()) {
             conn.setAutoCommit(false);
 
-            // ✅ 3. Get user ID
             int userId = -1;
             try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM users WHERE username = ?")) {
                 ps.setString(1, username);
@@ -53,7 +50,6 @@ public class ResetPasswordServlet extends HttpServlet {
                 }
             }
 
-            // ✅ 4. Check last 4 passwords (using PasswordUtil.verifyPassword)
             try (PreparedStatement ps = conn.prepareStatement(
                     "SELECT password_hash FROM (SELECT password_hash FROM password_history WHERE user_id = ? ORDER BY created_at DESC) WHERE ROWNUM <= 4")) {
                 ps.setInt(1, userId);
@@ -67,10 +63,8 @@ public class ResetPasswordServlet extends HttpServlet {
                 }
             }
 
-            // ✅ 5. Hash new password with PasswordUtil
             String hashedPassword = PasswordUtil.hashPassword(newPassword);
 
-            // ✅ 6. Update user's password
             try (PreparedStatement ps = conn.prepareStatement(
                     "UPDATE users SET password_hash = ? WHERE id = ?")) {
                 ps.setString(1, hashedPassword);
@@ -78,7 +72,6 @@ public class ResetPasswordServlet extends HttpServlet {
                 ps.executeUpdate();
             }
 
-            // ✅ 7. Add new password to password history
             try (PreparedStatement ps = conn.prepareStatement(
                     "INSERT INTO password_history (user_id, password_hash) VALUES (?, ?)")) {
                 ps.setInt(1, userId);
@@ -96,7 +89,6 @@ public class ResetPasswordServlet extends HttpServlet {
         }
     }
 
-    // ✅ Password complexity check (same rules you use elsewhere)
     private boolean isPasswordComplex(String password) {
         if (password.length() < 8) return false;
         boolean hasUpper = false, hasLower = false, hasDigit = false, hasSpecial = false;
@@ -111,3 +103,4 @@ public class ResetPasswordServlet extends HttpServlet {
         return hasUpper && hasLower && hasDigit && hasSpecial;
     }
 }
+
