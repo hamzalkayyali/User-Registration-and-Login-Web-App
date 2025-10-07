@@ -23,9 +23,8 @@ public class DeleteMyAccountServlet extends HttpServlet {
         String username = (String) session.getAttribute("username");
 
         try (Connection conn = DBUtil.getConnection()) {
-            conn.setAutoCommit(false); // Start transaction
+            conn.setAutoCommit(false);
 
-            // Get the user_id first
             PreparedStatement psUserId = conn.prepareStatement(
                 "SELECT id FROM users WHERE username = ?"
             );
@@ -40,14 +39,12 @@ public class DeleteMyAccountServlet extends HttpServlet {
 
             int userId = rs.getInt("id");
 
-            // Delete password history linked to that user_id
             PreparedStatement psHistory = conn.prepareStatement(
                 "DELETE FROM password_history WHERE user_id = ?"
             );
             psHistory.setInt(1, userId);
             psHistory.executeUpdate();
 
-            // Delete user from users table
             PreparedStatement psUser = conn.prepareStatement(
                 "DELETE FROM users WHERE id = ?"
             );
@@ -71,3 +68,4 @@ public class DeleteMyAccountServlet extends HttpServlet {
         }
     }
 }
+
