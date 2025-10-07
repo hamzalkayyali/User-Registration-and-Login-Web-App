@@ -31,7 +31,6 @@ public class ForceChangePasswordServlet extends HttpServlet {
             return;
         }
 
-        // ✅ Password complexity check
         if (!isPasswordComplex(newPassword)) {
             request.setAttribute("message", "Password must be at least 8 characters long, contain uppercase, lowercase, a number, and a special character.");
             request.getRequestDispatcher("forceChangePassword.jsp").forward(request, response);
@@ -41,7 +40,6 @@ public class ForceChangePasswordServlet extends HttpServlet {
         try (Connection conn = DBUtil.getConnection()) {
             conn.setAutoCommit(false);
 
-            // ✅ Check last 4 passwords
             try (PreparedStatement ps = conn.prepareStatement(
                     "SELECT password_hash FROM (SELECT password_hash FROM password_history WHERE user_id=? ORDER BY created_at DESC) WHERE ROWNUM <= 4")) {
                 ps.setInt(1, userId);
@@ -55,10 +53,8 @@ public class ForceChangePasswordServlet extends HttpServlet {
                 }
             }
 
-            // ✅ Hash new password
             String hashedPassword = PasswordUtil.hashPassword(newPassword);
 
-            // ✅ Update user password
             try (PreparedStatement ps = conn.prepareStatement(
                     "UPDATE users SET password_hash=? WHERE id=?")) {
                 ps.setString(1, hashedPassword);
@@ -66,7 +62,6 @@ public class ForceChangePasswordServlet extends HttpServlet {
                 ps.executeUpdate();
             }
 
-            // ✅ Insert into password history
             try (PreparedStatement ps = conn.prepareStatement(
                     "INSERT INTO password_history (user_id, password_hash) VALUES (?, ?)")) {
                 ps.setInt(1, userId);
@@ -76,7 +71,6 @@ public class ForceChangePasswordServlet extends HttpServlet {
 
             conn.commit();
 
-            // ✅ Password updated, redirect to home
             response.sendRedirect("home.jsp?message=Password+changed+successfully!");
 
         } catch (Exception e) {
@@ -98,3 +92,4 @@ public class ForceChangePasswordServlet extends HttpServlet {
         return hasUpper && hasLower && hasDigit && hasSpecial;
     }
 }
+
