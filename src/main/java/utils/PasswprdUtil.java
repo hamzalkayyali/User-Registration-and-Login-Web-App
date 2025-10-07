@@ -25,7 +25,6 @@ public class PasswordUtil {
         md.update(salt.getBytes());
         byte[] hashed = md.digest(password.getBytes());
         String hash = Base64.getEncoder().encodeToString(hashed);
-        // store as salt:hash
         return salt + ":" + hash;
     }
 
