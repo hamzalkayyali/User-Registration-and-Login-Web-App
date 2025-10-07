@@ -34,7 +34,6 @@ public class UpdatePasswordServlet extends HttpServlet {
 
         try (Connection conn = DBUtil.getConnection()) {
 
-            // Step 1: Find user ID using username
             int userId = -1;
             PreparedStatement findUser = conn.prepareStatement("SELECT id, password_hash FROM users WHERE username = ?");
             findUser.setString(1, username);
@@ -49,14 +48,12 @@ public class UpdatePasswordServlet extends HttpServlet {
             userId = rsUser.getInt("id");
             String storedHash = rsUser.getString("password_hash");
 
-            // Step 2: Verify current password
             if (!PasswordUtil.verifyPassword(currentPassword, storedHash)) {
                 request.setAttribute("message", "Current password is incorrect!");
                 request.getRequestDispatcher("editUser.jsp?username=" + username).forward(request, response);
                 return;
             }
 
-            // Step 3: Check last 4 password hashes
             PreparedStatement ps = conn.prepareStatement(
                 "SELECT password_hash FROM (SELECT password_hash FROM password_history WHERE user_id=? ORDER BY created_at DESC) WHERE ROWNUM <= 4"
             );
@@ -71,7 +68,6 @@ public class UpdatePasswordServlet extends HttpServlet {
                 }
             }
 
-            // Step 4: Hash new password and update
             String hashedPassword = PasswordUtil.hashPassword(newPassword);
 
             PreparedStatement updateUser = conn.prepareStatement(
@@ -81,7 +77,6 @@ public class UpdatePasswordServlet extends HttpServlet {
             updateUser.setInt(2, userId);
             updateUser.executeUpdate();
 
-            // Step 5: Insert into password_history
             PreparedStatement insertHistory = conn.prepareStatement(
                 "INSERT INTO password_history (id, user_id, password_hash) VALUES (password_history_seq.NEXTVAL, ?, ?)"
             );
@@ -89,7 +84,6 @@ public class UpdatePasswordServlet extends HttpServlet {
             insertHistory.setString(2, hashedPassword);
             insertHistory.executeUpdate();
 
-            // Step 6: Success message
             request.setAttribute("message", "Password updated successfully!");
             request.getRequestDispatcher("editUser.jsp?username=" + username).forward(request, response);
 
@@ -100,3 +94,4 @@ public class UpdatePasswordServlet extends HttpServlet {
         }
     }
 }
+
