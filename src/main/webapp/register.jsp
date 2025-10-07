@@ -4,17 +4,25 @@
     	<title>Register</title>
 	</head>
 	<body>
-		<h2>User Registration</h2>
-		<form action="RegisterServlet" method="post">
-    		Username: <input type="text" name="username" required><br>
-    		Password: <input type="password" name="password" required><br>
-    		<input type="submit" value="Register">
-		</form>
-		<!-- Button that links to login.jsp -->
-		<br>
-		<a href="login.jsp">
-    		<button type="button">Go to Login</button>
-		</a>
+    	<h2>Register</h2>
 
+    	<% 
+        	String message = (String) request.getAttribute("message");
+        	if (message != null && !message.isEmpty()) {
+    	%>
+        	<p style="color:red;"><%= message %></p>
+    	<% } %>
+
+    	<form action="RegisterServlet" method="post">
+        	<label>Username:</label>
+        	<input type="text" name="username" required><br><br>
+
+        	<label>Password:</label>
+        	<input type="password" name="password" required><br><br>
+
+        	<button type="submit">Register</button>
+    	</form>
+
+    	<p>Already have an account? <a href="login.jsp">Login here</a></p>
 	</body>
 </html>
