@@ -15,18 +15,30 @@ When a user logs in successfully, the homepage displays a list of all registered
 ---
 
 ## 🚀 Features
-- ✅ User Registration (sign up with username + password)  
-- ✅ User Login (authenticate with Oracle DB)  
-- ✅ Show all registered users on the homepage after login  
-- ✅ Oracle Database integration using JDBC  
+- ✅ **User Registration** (sign up with username + password)  
+- ✅ **User Login** (authenticate with Oracle DB)  
+- ✅ **Show all registered users** on the homepage after login  
+- ✅ **Oracle Database Integration** using JDBC  
 - ✅ **Password Management**:
   - Passwords must be **complex** (uppercase, lowercase, digit, special character)  
   - Users **cannot reuse any of their last 4 passwords**  
   - Passwords are **hashed** before storing (never stored in plain text)  
   - **Reset Password** functionality (for users who forgot their password)  
   - **Force Password Change** if a password **expires after 90 days**  
+- ✅ **Role-Based Access Control (RBAC)**:
+  - Ability to **assign roles/functions** to users  
+  - Users can perform **only the functions assigned** to them  
+  - Each user can **change only their own password** (not others’)  
+  - Users with the **appropriate permission** can **reset passwords for other users** by generating a reset link  
 
 ---
 
-## 🎥 Demo
-Watch the app in action here: [Demo Video](https://youtu.be/2sMCAvb8YcU)
+## 🎥 Demo Videos
+
+### 🖥️ Application Demo  
+Watch the app in action here: [Demo Video](https://youtu.be/XmnXDwzMtFo)
+
+### 🗄️ Database Structure Demo  
+Watch the database setup and functionality here: [Database Demo Video](https://youtu.be/xd5GXlhDKEw)
+
+---
