@@ -2,9 +2,8 @@ package servlets;
 
 import java.io.IOException;
 import java.sql.*;
-
 import db.DBUtil;
-import utils.PasswordUtil; 
+import utils.PasswordUtil;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -18,7 +17,10 @@ public class ResetPasswordServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
 
+        System.out.println("=== ResetPasswordServlet CALLED ===");
+        
         String username = request.getParameter("username");
         String newPassword = request.getParameter("newPassword");
 
@@ -72,18 +74,21 @@ public class ResetPasswordServlet extends HttpServlet {
                 ps.executeUpdate();
             }
 
+            // FIXED: Added sequence for ID
             try (PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO password_history (user_id, password_hash) VALUES (?, ?)")) {
+                    "INSERT INTO password_history (id, user_id, password_hash) VALUES (password_history_seq.NEXTVAL, ?, ?)")) {
                 ps.setInt(1, userId);
                 ps.setString(2, hashedPassword);
                 ps.executeUpdate();
             }
 
             conn.commit();
+            System.out.println("Password reset successful for user: " + username);
             response.sendRedirect("login.jsp?message=Password+reset+successfully!");
 
         } catch (Exception e) {
             e.printStackTrace();
+            System.err.println("Error in ResetPasswordServlet: " + e.getMessage());
             request.setAttribute("message", "Error: " + e.getMessage());
             request.getRequestDispatcher("resetPassword.jsp").forward(request, response);
         }
@@ -92,15 +97,12 @@ public class ResetPasswordServlet extends HttpServlet {
     private boolean isPasswordComplex(String password) {
         if (password.length() < 8) return false;
         boolean hasUpper = false, hasLower = false, hasDigit = false, hasSpecial = false;
-
         for (char c : password.toCharArray()) {
             if (Character.isUpperCase(c)) hasUpper = true;
             else if (Character.isLowerCase(c)) hasLower = true;
             else if (Character.isDigit(c)) hasDigit = true;
             else hasSpecial = true;
         }
-
         return hasUpper && hasLower && hasDigit && hasSpecial;
     }
 }
-
