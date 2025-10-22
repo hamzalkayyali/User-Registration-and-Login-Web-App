@@ -92,4 +92,3 @@ public class ForceChangePasswordServlet extends HttpServlet {
         return hasUpper && hasLower && hasDigit && hasSpecial;
     }
 }
-
